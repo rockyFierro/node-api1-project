@@ -1,5 +1,5 @@
-# GET http://localhost:5000/api/users
-# GET http://localhost:5000/api/users/5
+ GET http://localhost:5000/api/users
+# GET http://localhost:5000/api/users/Ed%20Carter
 # GET http://localhost:5000/
 # POST http://localhost:5000/api/users
 # Content-Type: application/json
@@ -7,4 +7,4 @@
 #   "name":"rocky",
 #   "bio":"javascript is fun"
 # }
-DELETE http://localhost:5000/api/users/234
+# DELETE http://localhost:5000/api/users/234

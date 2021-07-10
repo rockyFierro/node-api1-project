@@ -3,34 +3,56 @@ const express = require('express');
 const server = express();
 const User = require('./users/model')
 
-server.use(express.json())
+server.use(express.json());
 
-server.post('/api/users', async (request, respond) => {
-  const data = request.body;
-  const newData = await User.insert(data);
-  respond.status(201).json(newData);
-})
-
+// GET ALL FROM '/'
 server.get('/',
-  (request, respond) => {
-    respond.send('hello there, express welcomes you.');
+  (request, response) => {
+    response.status(200).json({ message: 'hello' })
   });
 
-server.get('/api/users', async (request, respond) => {
-  const users = await User.find();
-  respond.status(200).json(users);
-});
+// GET ALL USERS FROM '/users'
+server.get('/api/users',
+  (request, response) => {
+    User.find()
+      .then(users => {
+        response.status(200).json(users);
+      })
+      .catch(error => {
+        response.status(500).json({
+          message: "something has gone terribly wrong: ",
+          error: error.message,
+          stack: error.stack
+        });
+      });
+  });
 
-server.get('/api/users/:id', async (request, response) => {
-  const { id } = request.params.id;
-  const user = await User.findById(id);
-  response.status(200).json(user);
-});
+// GET SPECIFIC FROM '/users/:id'
+server.get('/api/users/:id',
+  (request, response) => {
+    User.findById(request.params.id)
+      .then(user => {
+        user.id === request.params.id ?
+        response.status(200).json(user) :
+        response.status(400).json({message:'bad request, please check Uri spelling.'})
+      })
+      .catch(error => {
+        response.status(404).json({
+          message: "The user with the specified ID does not exist.",
+          error: error.message,
+          stack: error.stack,
+          status:error.status
+        });
+      });
+  });
 
-server.delete('/api/users/:id', async (request, response)=>{
-  const { id } = request.params.id;
-  const data = await User.remove(id);
-  response.status(204).json(data);
-});
+  
 
-module.exports = server; // EXPORT YOUR SERVER instead of {}
+  server.get('*',
+  (request, response)=>{
+    response.status(404).json({
+      message: 'does not exist'
+    });
+  });
+
+module.exports = server;
