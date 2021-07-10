@@ -20,7 +20,8 @@ server.get('/api/users',
       })
       .catch(error => {
         response.status(500).json({
-          message: "something has gone terribly wrong: ",
+          message: "White Rabbit object, whatever it is;" +
+              " It did it all.",
           error: error.message,
           stack: error.stack
         });
