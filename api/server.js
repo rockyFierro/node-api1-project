@@ -47,7 +47,11 @@ server.get('/api/users/:id',
       });
   });
 
-  
+  //POST	/api/users	Creates a user using the information sent inside the request body.
+  server.post('/api/users',
+      (request,response)=>{
+
+      })
 
   server.get('*',
   (request, response)=>{
