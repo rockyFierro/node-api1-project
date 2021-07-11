@@ -21,7 +21,7 @@ server.get('/api/users',
       .catch(error => {
         response.status(500).json({
           message: "White Rabbit object, whatever it is;" +
-              " It did it all.",
+            " It did it all.",
           error: error.message,
           stack: error.stack
         });
@@ -34,27 +34,56 @@ server.get('/api/users/:id',
     User.findById(request.params.id)
       .then(user => {
         user.id === request.params.id ?
-        response.status(200).json(user) :
-        response.status(400).json({message:'bad request, please check Uri spelling.'})
+          response.status(200).json(user) :
+          response.status(400).json({ message: 'bad request, please check Uri spelling.' })
       })
       .catch(error => {
         response.status(404).json({
           message: "The user with the specified ID does not exist.",
           error: error.message,
           stack: error.stack,
-          status:error.status
+          status: error.status
         });
       });
   });
 
-  //POST	/api/users	Creates a user using the information sent inside the request body.
-  server.post('/api/users',
-      (request,response)=>{
+//POST	/api/users	Creates a user using the information sent inside the request body.
+server.post('/api/users',
+  (request, response) => {
+    const user = request.body;
 
-      })
+    (!user.name || !user.bio) ?
+      response.status(400).json({
+        message: "Please provide name and bio for the user"
+      }) : User.insert(user)
+        .then(newUser => {
+          response.status(201).json(newUser);
+          console.log('new user created');
+        })
+        .catch(error => {
+          response.status(500).json({
+            message: "Uh oh! Something wen't wrong creating user.",
+            error: error.message,
+            stack: error.stack,
+            status: error.status
+          });
+        });
+  });
 
-  server.get('*',
-  (request, response)=>{
+server.delete('/api/users/:id', async (request, response) => {
+    const possibleUser = await User.findById(request.params.id);
+
+    if(!possibleUser){
+      response.status(404).json({ message: "The user with the specified ID does not exist" });
+    }else{
+      const deletedUser = await User.remove(possibleUser.id);
+      response.status(200).json(deletedUser);
+    }
+  });
+
+
+server.get('*',
+  (request, response) => {
     response.status(404).json({
       message: 'does not exist'
     });
