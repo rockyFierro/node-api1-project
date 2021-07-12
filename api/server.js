@@ -71,16 +71,43 @@ server.post('/api/users',
   });
 
 server.delete('/api/users/:id', async (request, response) => {
+  const possibleUser = await User.findById(request.params.id);
+
+  if (!possibleUser) {
+    response.status(404).json({ message: "The user with the specified ID does not exist" });
+
+  } else {
+    const deletedUser = await User.remove(possibleUser.id);
+    response.status(200).json(deletedUser);
+  }
+});
+
+server.put('/api/users/:id', async (request, response) => {
+  try {
     const possibleUser = await User.findById(request.params.id);
-
-    if(!possibleUser){
-      response.status(404).json({ message: "The user with the specified ID does not exist" });
-    }else{
-      const deletedUser = await User.remove(possibleUser.id);
-      response.status(200).json(deletedUser);
+    if (!possibleUser) {
+      response.status(404).json({
+        message: 'The user with the specified ID does not exist'
+      });
+    } else {
+      if (!request.body.name || !request.body.bio) {
+        response.status(400).json({
+          message: 'Please provide name and bio for the user'
+        });
+      } else {
+       const updatedUser = await User.update(request.params.id, request.body);
+       response.status(200).json(updatedUser)
+      }
     }
-  });
-
+  }
+  catch (error) {
+    response.status(500).json({
+      message: "The user information could not be modified",
+      status: error.status,
+      stack: error.stack
+    });
+  }
+});
 
 server.get('*',
   (request, response) => {
